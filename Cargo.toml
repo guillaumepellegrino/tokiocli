@@ -10,6 +10,7 @@ authors = ["Guillaume Pellegrino <guillaume.pellegrino@yahoo.com>"]
 keywords = ["cli", "console", "terminal", "unix", "linux", "tokio", "async"]
 categories = ["command-line-utilities"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
+tokio = { version = "1", features = ["full"] }
+eyre = "0.6.8"
+termios = "0.3.3"
