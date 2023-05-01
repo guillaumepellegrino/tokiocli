@@ -2,6 +2,13 @@
 name = "tokio_cli"
 version = "0.1.0"
 edition = "2021"
+description = "A Unix CLI based on Tokio"
+readme = "README.md"
+repository = "https://github.com/guillaumepellegrino/tokio_cli"
+license = "MIT"
+authors = ["Guillaume Pellegrino <guillaume.pellegrino@yahoo.com>"]
+keywords = ["cli", "console", "terminal", "unix", "linux", "tokio", "async"]
+categories = ["command-line-utilities"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
