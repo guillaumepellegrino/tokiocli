@@ -153,7 +153,7 @@ impl Cli {
         Ok(())
     }
 
-    async fn history_prev(&mut self) -> Result<()> {
+    fn history_prev(&mut self) -> Result<()> {
         self.history_idx = match self.history_idx {
             Some(idx) => match idx {
                 0 => Some(idx),
@@ -168,7 +168,7 @@ impl Cli {
         self.history_restore()
     }
 
-    async fn history_next(&mut self) -> Result<()> {
+    fn history_next(&mut self) -> Result<()> {
         self.history_idx = match self.history_idx {
             Some(idx) => {
                 if (idx + 1) < self.history.len() {
@@ -183,13 +183,13 @@ impl Cli {
         self.history_restore()
     }
 
-    async fn cursor_reset(&mut self) -> Result<()> {
+    fn cursor_reset(&mut self) -> Result<()> {
         eprint!("{}", EscSeq::Left(self.cursor));
         self.cursor = 0;
         Ok(())
     }
 
-    async fn cursor_left(&mut self) -> Result<()> {
+    fn cursor_left(&mut self) -> Result<()> {
         if self.cursor > 0 {
             eprint!("{}", EscSeq::Left(1));
             self.cursor -= 1;
@@ -197,7 +197,7 @@ impl Cli {
         Ok(())
     }
 
-    async fn cursor_right(&mut self) -> Result<()> {
+    fn cursor_right(&mut self) -> Result<()> {
         if self.cursor < self.cmd.len() {
             eprint!("{}", EscSeq::Right(1));
             self.cursor += 1;
@@ -218,19 +218,19 @@ impl Cli {
             }
             0x41 => {
                 // UP
-                self.history_prev().await?;
+                self.history_prev()?;
             }
             0x42 => {
                 // LOW
-                self.history_next().await?;
+                self.history_next()?;
             }
             0x43 => {
                 // RIGHT
-                self.cursor_right().await?;
+                self.cursor_right()?;
             }
             0x44 => {
                 // LEFT
-                self.cursor_left().await?;
+                self.cursor_left()?;
             }
             _ => {
                 eprintln!("Unhandled ANSI Escape Sequence: {}", c);
@@ -239,7 +239,7 @@ impl Cli {
         Ok(())
     }
 
-    async fn addchar(&mut self, c: char) -> Result<()> {
+    fn addchar(&mut self, c: char) -> Result<()> {
         if self.cursor < self.cmd.len() {
             let right = &self.cmd[self.cursor..];
             eprint!("{}{}{}", c, right, EscSeq::Left(right.len()));
@@ -252,7 +252,7 @@ impl Cli {
         Ok(())
     }
 
-    async fn backspace(&mut self) -> Result<()> {
+    fn backspace(&mut self) -> Result<()> {
         if self.cursor == 0 {
             return Ok(());
         }
@@ -279,7 +279,7 @@ impl Cli {
         Ok(())
     }
 
-    async fn eol(&mut self) -> Result<Vec<String>> {
+    fn eol(&mut self) -> Result<Vec<String>> {
         eprintln!();
         let args = self.cmd2args();
         if !args[0].is_empty() {
@@ -301,7 +301,7 @@ impl Cli {
 
             match c {
                 0x01 | 0x02 => {
-                    self.cursor_reset().await?;
+                    self.cursor_reset()?;
                 }
                 0x1B => {
                     // ESC (escap)
@@ -309,36 +309,21 @@ impl Cli {
                 }
                 0x7F => {
                     // DEL
-                    self.backspace().await?;
+                    self.backspace()?;
                 }
                 b'\n' => {
                     self.do_reset = true;
-                    return Ok(Action::Command(self.eol().await?));
+                    return Ok(Action::Command(self.eol()?));
                 }
                 b'\t' => {
                     return Ok(Action::AutoComplete(self.cmd2args()));
                 }
                 _ => {
-                    self.addchar(c as char).await?;
+                    self.addchar(c as char)?;
                 }
             }
         }
     }
-
-    /*
-    /** Get the list of arguments inputed by User. */
-    pub async fn getargs(self: &mut Self) -> Result<Vec<String>> {
-        loop {
-            let action = self.getaction().await?;
-            match action {
-                Action::Command(args) => {return Ok(args);},
-                Action::AutoComplete(args) => {
-                    self.autocomplete(&Vec::<String>::new());
-                },
-            }
-        }
-    }
-    */
 
     /** Auto-complete the current command with the provided list of possible words */
     pub fn autocomplete(&mut self, words: &Vec<String>) -> Result<()> {
