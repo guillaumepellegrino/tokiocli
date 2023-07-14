@@ -1,9 +1,18 @@
+//! A Unix [`Cli`] based on Tokio.
+//!
+//! This crate provide a simple library allowing to write
+//! interactive Command Line Interface in an Unix spirit.
+//!
+//! APIs are async and thus can be easily integrated in a Tokio crate.
 use eyre::Result;
 use termios::*;
 use tokio::io::{stdin, AsyncReadExt, BufReader, Stdin};
 
+/** An Action performed by the user: execute a command or auto-complete the current command. */
 pub enum Action {
+    /** User demand to execute the following command (Command Name + Arguments). */
     Command(Vec<String>),
+    /** User demand to auto-complete the following command (Command Name + Arguments). */
     AutoComplete(Vec<String>),
 }
 
@@ -37,7 +46,7 @@ impl std::fmt::Display for EscSeq {
     }
 }
 
-/** A Unix like Command Line Interface */
+/** Provide APIs to interact with the Command Line Interface */
 pub struct Cli {
     saved_termios: Termios,
     reader: BufReader<Stdin>,
@@ -50,6 +59,11 @@ pub struct Cli {
 }
 
 impl Cli {
+    /**
+     * Create a new Command Line Interface.
+     *
+     * Note that it configures the terminal in character mode.
+     */
     pub fn new() -> Result<Self> {
         let fd = 0;
         let saved = Termios::from_fd(fd)?;
@@ -274,6 +288,9 @@ impl Cli {
         Ok(args)
     }
 
+    /**
+     * Return an Action demanded by the user in CLI.
+     */
     pub async fn getaction(&mut self) -> Result<Action> {
         if self.do_reset {
             self.reset()?;
@@ -308,8 +325,8 @@ impl Cli {
         }
     }
 
-    /** Get the list of arguments inputed by User. */
     /*
+    /** Get the list of arguments inputed by User. */
     pub async fn getargs(self: &mut Self) -> Result<Vec<String>> {
         loop {
             let action = self.getaction().await?;
@@ -323,6 +340,7 @@ impl Cli {
     }
     */
 
+    /** Auto-complete the current command with the provided list of possible words */
     pub fn autocomplete(&mut self, words: &Vec<String>) -> Result<()> {
         if words.is_empty() {
             // Nothing to do
@@ -360,6 +378,7 @@ impl Cli {
         Ok(())
     }
 
+    /** Set the name of the prompt */
     pub fn setprompt(&mut self, prompt: &str) -> &mut Self {
         self.prompt = prompt.into();
         self
@@ -367,6 +386,9 @@ impl Cli {
 }
 
 impl Drop for Cli {
+    /**
+     * Release Cli ressources and configure back the terminal in its orignal state.
+     */
     fn drop(&mut self) {
         let fd = 0;
         if let Err(e) = tcsetattr(fd, TCSANOW, &self.saved_termios) {
