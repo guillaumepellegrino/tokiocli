@@ -1,5 +1,5 @@
 # TokioCLI
-A Unix CLI based on Tokio
+An Unix CLI based on Tokio
 
 TokioCLI is a very simple async libary allowing to build interactive CLI for UNIX systems.
 

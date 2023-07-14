@@ -2,7 +2,7 @@
 name = "tokiocli"
 version = "0.1.0"
 edition = "2021"
-description = "A Unix CLI based on Tokio"
+description = "An Unix CLI based on Tokio"
 readme = "README.md"
 repository = "https://github.com/guillaumepellegrino/tokiocli"
 license = "MIT"
