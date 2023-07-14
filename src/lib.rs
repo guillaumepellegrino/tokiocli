@@ -239,7 +239,7 @@ impl Cli {
     }
 
     async fn backspace(&mut self) -> Result<()> {
-        if self.cursor <= 0 {
+        if self.cursor == 0 {
             return Ok(());
         }
 
@@ -376,27 +376,22 @@ impl Drop for Cli {
 }
 
 fn common_chars<'a>(lstr: &'a str, rstr: &'_ str) -> &'a str {
-    let mut lindices = lstr.char_indices();
+    let lindices = lstr.char_indices();
     let mut rindices = rstr.char_indices();
     let mut common = 0;
 
-    loop {
-        match lindices.next() {
-            Some((_, lchar)) => match rindices.next() {
-                Some((_, rchar)) => {
-                    if lchar != rchar {
-                        break;
-                    }
-                    common += 1;
-                }
-                None => {
+    for (_, lchar) in lindices {
+        match rindices.next() {
+            Some((_, rchar)) => {
+                if lchar != rchar {
                     break;
                 }
-            },
+                common += 1;
+            }
             None => {
                 break;
             }
-        }
+        };
     }
 
     &lstr[0..common]
