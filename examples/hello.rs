@@ -10,6 +10,7 @@ async fn main() -> eyre::Result<()> {
         match action {
             Action::Command(cmd) => runcmd(cmd, &mut exit),
             Action::AutoComplete(cmd) => autocomplete(&mut cli, cmd)?,
+            Action::NoAction => exit = true,
         };
     }
 
