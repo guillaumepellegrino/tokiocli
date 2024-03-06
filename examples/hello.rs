@@ -38,7 +38,7 @@ fn runcmd(cmd: Vec<String>, exit: &mut bool) {
 }
 
 fn autocomplete(cli: &mut Cli, cmd: Vec<String>) -> eyre::Result<()> {
-    let cmdlist = vec![
+    let mut cmdlist = vec![
         String::from("hello"),
         String::from("upper"),
         String::from("exit"),
@@ -46,6 +46,7 @@ fn autocomplete(cli: &mut Cli, cmd: Vec<String>) -> eyre::Result<()> {
     ];
 
     if cmd.len() == 1 {
+        cmdlist.retain(|x| x.starts_with(&cmd[0]));
         // autocomplete command
         cli.autocomplete(&cmdlist)?;
     } else if cmd.len() > 1 {
