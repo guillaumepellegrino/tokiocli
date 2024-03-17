@@ -332,7 +332,13 @@ impl Cli {
         }
     }
 
-    /** Auto-complete the current command with the provided list of possible words */
+    /**
+     * Auto-complete the current command with the provided list of possible words
+     *
+     * <div class="warning">The word list should only contains possible words for the current
+     * input. This function does not filter out the word list, and expect all words in the list to
+     * start with current input.</div>
+     */
     pub fn autocomplete(&mut self, words: &Vec<String>) -> Result<()> {
         if words.is_empty() {
             // Nothing to do
