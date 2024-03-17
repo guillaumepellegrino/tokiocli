@@ -14,6 +14,8 @@ pub enum Action {
     Command(Vec<String>),
     /** User demand to auto-complete the following command (Command Name + Arguments). */
     AutoComplete(Vec<String>),
+    /** getaction stopped without any actions to report (e.g. EOT was received, on an empty line). */
+    NoAction,
 }
 
 /** Human-readable ANSI Escape Sequences */
@@ -302,6 +304,11 @@ impl Cli {
             match c {
                 0x01 | 0x02 => {
                     self.cursor_reset()?;
+                }
+                0x04 => {
+                    if self.cmd.len() == 0 {
+                        return Ok(Action::NoAction)
+                    }
                 }
                 0x1B => {
                     // ESC (escap)
